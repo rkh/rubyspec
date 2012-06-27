@@ -365,6 +365,9 @@ module ModuleSpecs
     include CyclicAppendA
   end
 
+  module CyclicPrepend
+  end
+
   module ExtendObject
     C = :test
     def test_method
