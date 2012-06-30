@@ -4,29 +4,29 @@ require File.expand_path('../fixtures/classes', __FILE__)
 ruby_version_is "2.0" do
   describe "Module#prepend" do
     it "calls #prepend_features(self) in reversed order on each module" do
-      $prepended_modules = []
+      ScratchPad.record []
 
       m = Module.new do
         def self.prepend_features(mod)
-          $prepended_modules << [ self, mod ]
+          ScratchPad << [ self, mod ]
         end
       end
 
       m2 = Module.new do
         def self.prepend_features(mod)
-          $prepended_modules << [ self, mod ]
+          ScratchPad << [ self, mod ]
         end
       end
 
       m3 = Module.new do
         def self.prepend_features(mod)
-          $prepended_modules << [ self, mod ]
+          ScratchPad << [ self, mod ]
         end
       end
 
       c = Class.new { prepend(m, m2, m3) }
 
-      $prepended_modules.should == [ [ m3, c], [ m2, c ], [ m, c ] ]
+      ScratchPad.recorded.should == [ [ m3, c], [ m2, c ], [ m, c ] ]
     end
 
     it "raises a TypeError when the argument is not a Module" do
@@ -99,19 +99,19 @@ ruby_version_is "2.0" do
     end
 
     it "calls prepended after prepend_features" do
-      $prepend_calls = []
+      ScratchPad.record []
 
       m = Module.new do
         def self.prepend_features(klass)
-          $prepend_calls << [:prepend_features, klass]
+          ScratchPad << [:prepend_features, klass]
         end
         def self.prepended(klass)
-          $prepend_calls << [:prepended, klass]
+          ScratchPad << [:prepended, klass]
         end
       end
 
       c = Class.new { prepend(m) }
-      $prepend_calls.should == [[:prepend_features, c], [:prepended, c]]
+      ScratchPad.recorded.should == [[:prepend_features, c], [:prepended, c]]
     end
 
     it "detects cyclic prepends" do
